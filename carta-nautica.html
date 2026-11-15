@@ -112,12 +112,12 @@ footer{border-top:1px solid var(--ink);padding-block:22px 28px}
   <div class="chartbox">
     <div class="mapwrap">
       <div class="routes" role="group" aria-label="Escolher rota">
-        <button type="button" id="b-nit" aria-pressed="true"><svg viewBox="0 0 22 6"><path d="M0 3h22" stroke="#b0157a" stroke-width="3" stroke-dasharray="5 3"/></svg>De Niterói</button>
+        <button type="button" id="b-ilh" aria-pressed="true"><svg viewBox="0 0 22 6"><path d="M0 3h22" stroke="#c46a12" stroke-width="3" stroke-dasharray="2 3"/></svg>Ilhas</button>
+        <button type="button" id="b-nit" aria-pressed="false"><svg viewBox="0 0 22 6"><path d="M0 3h22" stroke="#b0157a" stroke-width="3" stroke-dasharray="5 3"/></svg>De Niterói</button>
         <button type="button" id="b-rio" aria-pressed="false"><svg viewBox="0 0 22 6"><path d="M0 3h22" stroke="#16324a" stroke-width="3" stroke-dasharray="5 3"/></svg>Do Rio</button>
         <button type="button" id="b-pra" aria-pressed="false"><svg viewBox="0 0 22 6"><path d="M0 3h22" stroke="#0f7c6b" stroke-width="3" stroke-dasharray="2 3"/></svg>Praias</button>
-        <button type="button" id="b-ilh" aria-pressed="false"><svg viewBox="0 0 22 6"><path d="M0 3h22" stroke="#c46a12" stroke-width="3" stroke-dasharray="2 3"/></svg>Ilhas</button>
       </div>
-      <svg id="map" viewBox="235 30 230 164" role="img" aria-label="Carta esquemática da entrada da Baía de Guanabara com Rio, Niterói, ilhas e as rotas dos passeios">
+      <svg id="map" viewBox="0 -20 880 628" role="img" aria-label="Carta esquemática da entrada da Baía de Guanabara com Rio, Niterói, ilhas e as rotas dos passeios">
         <defs>
           <path id="rio" d="M0 -300H332L330 0L322 60L312 100L300 122L318 132L332 140L336 150L322 158L300 162L288 172L276 186L258 200L236 208L210 212L182 222L150 230L120 238L80 250L40 258L-300 262V-300Z"/>
           <path id="nit" d="M395 -300L395 0L392 40L398 70L404 92L392 104L378 112L370 120L388 128L410 134L440 140L470 146L500 154L530 168L552 186L572 192L600 190L640 182L700 176L760 170L820 166L1200 164V-300Z"/>
@@ -153,7 +153,7 @@ footer{border-top:1px solid var(--ink);padding-block:22px 28px}
         </g>
         <g id="wps"></g>
       </svg>
-      <span class="zoomhint" id="zoomhint">zoom: rota de Niterói</span>
+      <span class="zoomhint" id="zoomhint">visão geral: ilhas</span>
     </div>
 
     <aside class="panel" aria-live="polite">
@@ -207,7 +207,7 @@ footer{border-top:1px solid var(--ink);padding-block:22px 28px}
 
 <footer class="wrap"><span class="mono">WhatsApp (00) 00000-0000 · carta esquemática, não usar para navegação</span></footer>
 
-<div class="bar"><span>Rota escolhida<b id="bar-name">Saindo de Niterói</b></span><a class="btn" id="bar-btn" href="https://wa.me/5500000000000" target="_blank" rel="noopener">Reservar</a></div>
+<div class="bar"><span>Rota escolhida<b id="bar-name">Ilhas oceânicas</b></span><a class="btn" id="bar-btn" href="https://wa.me/5500000000000" target="_blank" rel="noopener">Reservar</a></div>
 
 <script>
 (function(){
@@ -241,7 +241,7 @@ footer{border-top:1px solid var(--ink);padding-block:22px 28px}
     wps.appendChild(g);p.el=g;
   });
 
-  var cur='nit',vb=R.nit.vb.slice(),anim=null;
+  var cur='ilh',vb=R.ilh.vb.slice(),anim=null;
   // mantém textos e marcadores com o mesmo tamanho na tela, qualquer que seja o zoom
   function scaleUI(){
     var w=svg.clientWidth||343,k=vb[2]/w;
@@ -300,6 +300,6 @@ footer{border-top:1px solid var(--ink);padding-block:22px 28px}
   }
   Object.keys(R).forEach(function(k){document.getElementById('b-'+k).addEventListener('click',function(){route(k)})});
   addEventListener('resize',scaleUI);
-  route('nit');
+  route('ilh');
 })();
 </script>
