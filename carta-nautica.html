@@ -1,0 +1,305 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>html,body{margin:0}body{-webkit-text-size-adjust:100%}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Viva la Vida · Carta Náutica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,500;0,700;1,500&family=Space+Mono:wght@400;700&display=swap">
+<style>
+/* Layout (celular primeiro): a carta náutica da entrada da Baía de Guanabara dá zoom na rota escolhida; cada ponto abre foto e detalhes logo abaixo. Visual único por escolha. */
+:root{
+  --water:#f2f8f9;
+  --shallow:#cfe6ec;
+  --land:#ead9a6;
+  --ink:#16324a;
+  --muted:#5d7385;
+  --magenta:#b0157a;
+  --serif:"EB Garamond",Garamond,Georgia,serif;
+  --mono:"Space Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+body{background:var(--water);color:var(--ink);font-family:var(--serif);font-size:18px;line-height:1.5;padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+.wrap{max-width:1200px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.mono{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+
+.titleblock{padding-block:22px 16px;display:grid;gap:14px;border-bottom:1px solid var(--ink)}
+.titleblock > *{min-width:0}
+h1{font-weight:700;font-size:clamp(34px,9vw,76px);line-height:.98;margin:6px 0 0;letter-spacing:-.01em;text-wrap:balance}
+h1 i{font-weight:500;color:var(--magenta)}
+.cartouche{border:1px solid var(--ink);padding:10px 14px;font-family:var(--mono);font-size:11px;background:#fff;display:flex;flex-wrap:wrap;gap:4px 14px;align-items:baseline}
+.cartouche b{font-family:var(--serif);font-size:20px;letter-spacing:0;text-transform:none;width:100%}
+
+.chartbox{display:grid;grid-template-columns:1fr;margin-top:18px;border:2px solid var(--ink);background:#fff}
+.mapwrap{position:relative;min-width:0;border-bottom:2px solid var(--ink)}
+.routes{display:flex;gap:8px;overflow-x:auto;padding:10px;border-bottom:1px solid var(--ink);scrollbar-width:none}
+.routes button{flex:none;font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.04em;border:1.5px solid var(--ink);background:#fff;color:var(--ink);padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:8px;min-height:44px}
+.routes button svg{width:22px;height:6px}
+.routes button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.routes button:focus-visible{outline:2px solid var(--magenta);outline-offset:2px}
+#map{display:block;width:100%;height:auto;aspect-ratio:7/5;touch-action:manipulation}
+.wp{cursor:pointer;transition:opacity .25s}
+.wp .hit{fill:transparent}
+.wp:focus{outline:none}
+.wp:focus-visible .mark,.wp.on .mark{stroke:var(--magenta)}
+.wp .lbl{font-family:var(--serif);font-weight:700;fill:var(--ink);paint-order:stroke;stroke:var(--water);stroke-linejoin:round}
+.place{font-family:var(--serif);font-style:italic;fill:var(--ink)}
+.place.big{font-style:normal;letter-spacing:.3em;fill:#8a7a4a}
+.sound{font-family:var(--serif);fill:var(--muted)}
+.grat{font-family:var(--mono);fill:var(--muted)}
+.rt{fill:none;transition:opacity .25s}
+.zoomhint{position:absolute;right:10px;bottom:10px;font-family:var(--mono);font-size:10px;background:rgba(255,255,255,.85);border:1px solid var(--ink);padding:3px 6px;pointer-events:none}
+
+.panel{padding:16px;display:grid;grid-template-columns:120px 1fr;gap:6px 16px;align-items:start;min-width:0}
+.panel > *{min-width:0}
+.ph{grid-row:1 / 5;aspect-ratio:3/4;position:relative;border:1px solid var(--ink);overflow:hidden;background:linear-gradient(180deg,#cde8f0 45%,#5aa9c5 45%)}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+.ph img[hidden]{display:none}
+.ph i{position:absolute;left:4px;right:4px;bottom:4px;font-style:normal;font-family:var(--mono);font-size:9px;background:var(--ink);color:#fff;padding:2px 4px;text-align:center}
+.panel h2{font-size:26px;line-height:1.05;margin:0}
+.panel p{margin:0;font-size:16px;line-height:1.4}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-family:var(--mono);font-size:12px;margin:4px 0 0}
+.kv dt{color:var(--muted)}.kv dd{margin:0;font-weight:700}
+.stops{grid-column:1 / -1;display:flex;gap:6px;overflow-x:auto;padding-top:10px;margin-top:6px;border-top:1px dashed var(--muted);scrollbar-width:none}
+.stops button{flex:none;font-family:var(--mono);font-size:11px;text-transform:uppercase;border:1px solid var(--muted);background:#fff;color:var(--ink);padding:8px 10px;border-radius:999px;cursor:pointer;min-height:36px}
+.stops button[aria-current="true"]{border-color:var(--magenta);color:var(--magenta);font-weight:700}
+
+.cols{display:grid;grid-template-columns:1fr;gap:32px;padding-block:40px}
+.cols > div{min-width:0}
+.cols h3{font-size:26px;margin:4px 0 10px;line-height:1.1}
+table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:13px}
+td{padding:8px 0;border-bottom:1px dotted var(--muted)}
+td:last-child{text-align:right;font-weight:700}
+ul.list{margin:0;padding-left:18px}
+.notice{border:2px solid var(--magenta);padding:14px 16px}
+.notice b{color:var(--magenta);font-family:var(--mono);font-size:12px;letter-spacing:.08em}
+.strip{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:28px;margin-inline:calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding-inline:max(16px,env(safe-area-inset-left,0px));scrollbar-width:none}
+.strip figure{margin:0;border:1px solid var(--ink);background:#fff;padding:6px 6px 0;flex:0 0 62%;scroll-snap-align:start}
+.strip img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}
+.strip figcaption{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.06em;padding:6px 0;color:var(--muted)}
+footer{border-top:1px solid var(--ink);padding-block:22px 28px}
+
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;gap:12px;align-items:center;padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));background:#fff;border-top:2px solid var(--ink)}
+.bar span{flex:1;min-width:0;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);line-height:1.3}
+.bar span b{display:block;font-family:var(--serif);text-transform:none;letter-spacing:0;font-size:18px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn{background:var(--magenta);color:#fff;text-decoration:none;font-family:var(--mono);font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.04em;padding:14px 16px;white-space:nowrap}
+.btn:hover,.btn:focus-visible{background:var(--ink);outline:none}
+
+@media (min-width:900px){
+  body{padding-bottom:0}
+  .titleblock{grid-template-columns:1fr auto;align-items:end;padding-block:32px 20px}
+  .cartouche{display:grid;min-width:220px}
+  .chartbox{grid-template-columns:1fr 340px}
+  .mapwrap{border-bottom:0;border-right:2px solid var(--ink)}
+  .panel{display:flex;flex-direction:column;gap:10px;padding:20px}
+  .ph{aspect-ratio:4/3}
+  .cols{grid-template-columns:repeat(3,1fr);padding-block:56px}
+  .strip{display:grid;grid-template-columns:repeat(5,1fr);margin-inline:0;padding-inline:0;overflow:visible}
+  .bar{position:static;border:2px solid var(--ink);margin:0 auto 40px;max-width:1200px}
+}
+@media (prefers-reduced-motion:reduce){.wp,.rt{transition:none}}
+</style>
+
+<header class="wrap">
+  <div class="titleblock">
+    <div>
+      <div class="mono">Carta de passeios · Baía de Guanabara</div>
+      <h1>Escolha a rota <i>e veja onde a El Soñador te leva</i></h1>
+    </div>
+    <div class="cartouche"><b>El Soñador</b><span>Lancha 36 pés</span><span>5 h de passeio</span><span>Capitão + marinheiro</span></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="chartbox">
+    <div class="mapwrap">
+      <div class="routes" role="group" aria-label="Escolher rota">
+        <button type="button" id="b-nit" aria-pressed="true"><svg viewBox="0 0 22 6"><path d="M0 3h22" stroke="#b0157a" stroke-width="3" stroke-dasharray="5 3"/></svg>De Niterói</button>
+        <button type="button" id="b-rio" aria-pressed="false"><svg viewBox="0 0 22 6"><path d="M0 3h22" stroke="#16324a" stroke-width="3" stroke-dasharray="5 3"/></svg>Do Rio</button>
+        <button type="button" id="b-pra" aria-pressed="false"><svg viewBox="0 0 22 6"><path d="M0 3h22" stroke="#0f7c6b" stroke-width="3" stroke-dasharray="2 3"/></svg>Praias</button>
+        <button type="button" id="b-ilh" aria-pressed="false"><svg viewBox="0 0 22 6"><path d="M0 3h22" stroke="#c46a12" stroke-width="3" stroke-dasharray="2 3"/></svg>Ilhas</button>
+      </div>
+      <svg id="map" viewBox="235 30 230 164" role="img" aria-label="Carta esquemática da entrada da Baía de Guanabara com Rio, Niterói, ilhas e as rotas dos passeios">
+        <defs>
+          <path id="rio" d="M0 -300H332L330 0L322 60L312 100L300 122L318 132L332 140L336 150L322 158L300 162L288 172L276 186L258 200L236 208L210 212L182 222L150 230L120 238L80 250L40 258L-300 262V-300Z"/>
+          <path id="nit" d="M395 -300L395 0L392 40L398 70L404 92L392 104L378 112L370 120L388 128L410 134L440 140L470 146L500 154L530 168L552 186L572 192L600 190L640 182L700 176L760 170L820 166L1200 164V-300Z"/>
+          <g id="isl">
+            <ellipse cx="64" cy="300" rx="16" ry="7"/><ellipse cx="84" cy="306" rx="6" ry="4"/>
+            <ellipse cx="226" cy="298" rx="12" ry="6"/><ellipse cx="244" cy="306" rx="7" ry="4"/><ellipse cx="214" cy="310" rx="5" ry="3"/>
+            <ellipse cx="262" cy="372" rx="10" ry="9"/>
+            <ellipse cx="348" cy="370" rx="14" ry="6"/>
+            <ellipse cx="566" cy="214" rx="9" ry="6"/><ellipse cx="582" cy="222" rx="6" ry="4"/><ellipse cx="552" cy="222" rx="4" ry="3"/>
+            <ellipse cx="792" cy="236" rx="12" ry="6"/><ellipse cx="808" cy="242" rx="6" ry="4"/>
+          </g>
+        </defs>
+        <rect x="-300" y="-300" width="1500" height="1100" fill="var(--water)"/>
+        <g stroke="#16324a" stroke-opacity=".1" vector-effect="non-scaling-stroke"><path d="M220 -300V800M440 -300V800M660 -300V800M-300 115H1200M-300 230H1200M-300 345H1200" vector-effect="non-scaling-stroke"/></g>
+        <g fill="none" stroke="var(--shallow)" stroke-linejoin="round">
+          <use href="#rio" stroke-width="60" opacity=".5"/><use href="#rio" stroke-width="26"/>
+          <use href="#nit" stroke-width="60" opacity=".5"/><use href="#nit" stroke-width="26"/>
+          <use href="#isl" stroke-width="22" opacity=".6"/>
+        </g>
+        <g fill="var(--land)" stroke="var(--ink)" stroke-width="1.3"><use href="#rio"/><use href="#nit"/><use href="#isl"/></g>
+        <g class="sound" data-fs="10">
+          <text x="356" y="120">17</text><text x="356" y="190">24</text><text x="420" y="230">28</text><text x="300" y="250">31</text><text x="520" y="280">35</text><text x="160" y="360">38</text><text x="660" y="300">42</text><text x="460" y="400">45</text><text x="740" y="400">48</text><text x="120" y="420">44</text><text x="600" y="420">47</text><text x="460" y="120">21</text>
+        </g>
+        <g class="grat" data-fs="9"><text x="224" y="440">43°15'W</text><text x="444" y="440">43°05'W</text><text x="664" y="440">42°55'W</text></g>
+        <g class="place big" data-fs="18"><text x="150" y="110">RIO</text><text x="560" y="110">NITERÓI</text><text x="268" y="70" class="zoomonly">RIO</text><text x="414" y="56" class="zoomonly">NITERÓI</text></g>
+        <g class="place" data-fs="11"><text x="362" y="62" text-anchor="middle">Baía de Guanabara</text></g>
+
+        <g id="routes">
+          <path class="rt" id="r-nit" d="M402 86C384 118 354 148 334 156C352 136 372 114 388 104L402 86" stroke="#b0157a" vector-effect="non-scaling-stroke" stroke-width="3" stroke-dasharray="8 5"/>
+          <path class="rt" id="r-rio" d="M318 136Q336 146 334 156C362 150 392 112 402 86C382 100 346 118 318 136" stroke="#16324a" vector-effect="non-scaling-stroke" stroke-width="3" stroke-dasharray="8 5"/>
+          <path class="rt" id="r-pra" d="M402 86C380 112 360 132 392 136L422 142L494 162L548 194" stroke="#0f7c6b" vector-effect="non-scaling-stroke" stroke-width="3" stroke-dasharray="2 6" stroke-linecap="round"/>
+          <path class="rt" id="r-ilh" d="M360 170L226 296M360 170L64 296M360 170L348 362M360 170L566 210M360 170L790 232" stroke="#c46a12" vector-effect="non-scaling-stroke" stroke-width="2.5" stroke-dasharray="2 6" stroke-linecap="round"/>
+        </g>
+        <g id="wps"></g>
+      </svg>
+      <span class="zoomhint" id="zoomhint">zoom: rota de Niterói</span>
+    </div>
+
+    <aside class="panel" aria-live="polite">
+      <div class="ph" id="p-ph"><img id="p-img" alt=""><i id="p-cap">foto</i></div>
+      <span class="mono" id="p-kind"></span>
+      <h2 id="p-name"></h2>
+      <p id="p-txt"></p>
+      <dl class="kv" id="p-kv"></dl>
+      <div class="stops" id="stops" aria-label="Paradas desta rota"></div>
+    </aside>
+  </div>
+
+  <div class="cols">
+    <div>
+      <span class="mono">Ficha da embarcação</span>
+      <h3>El Soñador</h3>
+      <table>
+        <tr><td>Comprimento</td><td>36 pés ≈ 11 m</td></tr>
+        <tr><td>Duração</td><td>5 horas</td></tr>
+        <tr><td>Capitão</td><td>incluso</td></tr>
+        <tr><td>Marinheiro</td><td>incluso</td></tr>
+        <tr><td>Flybridge</td><td>sim</td></tr>
+      </table>
+    </div>
+    <div>
+      <span class="mono">A bordo</span>
+      <h3>O que está incluso</h3>
+      <ul class="list">
+        <li>1 capitão e 1 marinheiro</li>
+        <li>Kit churrasco, com churrasqueira na popa</li>
+        <li>Tapete flutuante nas paradas</li>
+        <li>Iluminação de LED à noite</li>
+      </ul>
+      <p class="mono" style="margin-top:12px">Cardápio de drinks opcional, cobrado à parte</p>
+    </div>
+    <div>
+      <span class="mono">Aviso aos navegantes</span>
+      <h3>Pacotes a combinar</h3>
+      <div class="notice"><b>ILHAS E PRAIAS</b><p style="margin:6px 0 0">Ilhas Tijucas, Cagarras, Rasa, Redonda, Maricás e Itaipu. Praias de Itaipu, Piratininga, Forte do Rio Branco e Imbuí. Roteiro e duração combinados conforme o mar do dia.</p></div>
+    </div>
+  </div>
+
+  <div class="strip" aria-label="Fotos">
+    <figure><img src="img/principal.jpg" alt="El Soñador com o Cristo ao fundo" loading="lazy"><figcaption>Fim de tarde</figcaption></figure>
+    <figure><img src="img/lancha.jpg" alt="El Soñador no píer" loading="lazy"><figcaption>No píer</figcaption></figure>
+    <figure><img src="img/flutuante.jpg" alt="Tapete flutuante" loading="lazy"><figcaption>Flutuante</figcaption></figure>
+    <figure><img src="img/churrasco.jpg" alt="Churrasco na popa" loading="lazy"><figcaption>Churrasco</figcaption></figure>
+    <figure><img src="img/noite.jpg" alt="El Soñador à noite" loading="lazy"><figcaption>À noite</figcaption></figure>
+  </div>
+</main>
+
+<footer class="wrap"><span class="mono">WhatsApp (00) 00000-0000 · carta esquemática, não usar para navegação</span></footer>
+
+<div class="bar"><span>Rota escolhida<b id="bar-name">Saindo de Niterói</b></span><a class="btn" id="bar-btn" href="https://wa.me/5500000000000" target="_blank" rel="noopener">Reservar</a></div>
+
+<script>
+(function(){
+  var ns='http://www.w3.org/2000/svg',svg=document.getElementById('map');
+  var R={
+    nit:{name:'Saindo de Niterói',vb:[235,30,230,164],hint:'zoom: rota de Niterói',stops:['jur','pvm','mor']},
+    rio:{name:'Saindo do Rio',vb:[235,30,230,164],hint:'zoom: rota do Rio',stops:['urc','pvm','jur']},
+    pra:{name:'Praias de Niterói',vb:[330,50,280,200],hint:'zoom: praias de Niterói',stops:['imb','pir','ita']},
+    ilh:{name:'Ilhas oceânicas',vb:[0,-20,880,628],hint:'visão geral: ilhas',stops:['cag','ras','tij','mar','ita']}
+  };
+  var pts=[
+    {id:'jur',x:402,y:86,dx:10,dy:4,a:'start',name:'Jurujuba',kind:'Embarque · Niterói',r:['nit','rio','pra'],img:'img/lancha.jpg',cap:'no píer',txt:'Ponto de embarque de quem sai de Niterói. Chegue 15 minutos antes para conhecer a lancha e a tripulação.',kv:[['Rota','Niterói'],['Duração','5 horas']]},
+    {id:'urc',x:318,y:136,dx:-10,dy:0,a:'end',name:'Urca',kind:'Embarque · Rio',r:['rio'],img:'img/principal.jpg',cap:'fim de tarde',txt:'Para quem está no Rio: embarque na Urca, aos pés do Pão de Açúcar.',kv:[['Rota','Saindo do Rio'],['Duração','5 horas']]},
+    {id:'pvm',x:334,y:156,dx:-10,dy:12,a:'end',name:'Praia Vermelha',kind:'Parada · Pão de Açúcar',r:['nit','rio'],img:'img/principal.jpg',cap:'vista da baía',txt:'A lancha para entre o Pão de Açúcar e o Morro da Urca. Uma das vistas mais bonitas do Rio, vista do mar.',kv:[['Rotas','Niterói e Rio'],['Alternativa','Urca']]},
+    {id:'mor',x:388,y:104,dx:-10,dy:-4,a:'end',name:'Ponta do Morcego',kind:'Parada para banho',r:['nit'],img:'img/flutuante.jpg',cap:'flutuante',txt:'Águas calmas para ancorar, colocar o tapete flutuante na água e acender a churrasqueira.',kv:[['Rota','Niterói'],['A bordo','flutuante e churrasco']]},
+    {id:'imb',x:422,y:142,dx:0,dy:18,a:'middle',name:'Imbuí e Forte do Rio Branco',short:'Imbuí',kind:'Pacote praias',r:['pra'],img:null,cap:'foto a enviar',txt:'Praias escondidas junto às fortalezas da entrada da baía, perto de Jurujuba.',kv:[['Pacote','a combinar']]},
+    {id:'pir',x:494,y:162,dx:0,dy:18,a:'middle',name:'Piratininga',kind:'Pacote praias',r:['pra'],img:null,cap:'foto a enviar',txt:'Praia oceânica de Niterói, com mar aberto e vista para as ilhas.',kv:[['Pacote','a combinar']]},
+    {id:'ita',x:548,y:194,dx:0,dy:18,a:'middle',name:'Itaipu',kind:'Pacote praias e ilhas',r:['pra','ilh'],img:null,cap:'foto a enviar',txt:'A praia de Itaipu e as ilhas do Pai, da Mãe e da Menina, logo em frente.',kv:[['Pacote','a combinar']]},
+    {id:'cag',x:226,y:296,dx:0,dy:-12,a:'middle',name:'Ilhas Cagarras',short:'Cagarras',kind:'Pacote ilhas',r:['ilh'],img:null,cap:'foto a enviar',txt:'Arquipélago em frente a Ipanema, com água clara e aves marinhas.',kv:[['Pacote','a combinar']]},
+    {id:'ras',x:348,y:362,dx:0,dy:18,a:'middle',name:'Rasa e Redonda',short:'Rasa e Redonda',kind:'Pacote ilhas',r:['ilh'],img:null,cap:'foto a enviar',txt:'As ilhas mais afastadas, com o farol da Ilha Rasa. Passeio para dia de mar calmo.',kv:[['Pacote','a combinar']]},
+    {id:'tij',x:64,y:296,dx:0,dy:18,a:'middle',name:'Ilhas Tijucas',short:'Tijucas',kind:'Pacote ilhas',r:['ilh'],img:null,cap:'foto a enviar',txt:'Em frente à Barra da Tijuca. Roteiro longo, combinado com antecedência.',kv:[['Pacote','a combinar']]},
+    {id:'mar',x:792,y:232,dx:0,dy:18,a:'middle',name:'Ilhas Maricás',short:'Maricás',kind:'Pacote ilhas',r:['ilh'],img:null,cap:'foto a enviar',txt:'No litoral de Maricá, a leste de Niterói. Para quem quer ir mais longe.',kv:[['Pacote','a combinar']]}
+  ];
+  var byId={};pts.forEach(function(p){byId[p.id]=p});
+  var wps=document.getElementById('wps');
+  pts.forEach(function(p){
+    var g=document.createElementNS(ns,'g');g.setAttribute('class','wp');g.setAttribute('tabindex','0');g.setAttribute('role','button');g.setAttribute('aria-label',p.name);
+    g.innerHTML='<circle class="hit" cx="'+p.x+'" cy="'+p.y+'"/><circle class="mark" cx="'+p.x+'" cy="'+p.y+'" fill="#fff" stroke="#16324a" vector-effect="non-scaling-stroke" stroke-width="3"/><circle class="dot" cx="'+p.x+'" cy="'+p.y+'" fill="#16324a"/><text class="lbl" text-anchor="'+p.a+'">'+(p.short||p.name)+'</text>';
+    g.addEventListener('click',function(){show(p)});
+    g.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();show(p)}});
+    wps.appendChild(g);p.el=g;
+  });
+
+  var cur='nit',vb=R.nit.vb.slice(),anim=null;
+  // mantém textos e marcadores com o mesmo tamanho na tela, qualquer que seja o zoom
+  function scaleUI(){
+    var w=svg.clientWidth||343,k=vb[2]/w;
+    svg.querySelectorAll('[data-fs]').forEach(function(g){g.style.fontSize=(parseFloat(g.dataset.fs)*k)+'px'});
+    svg.querySelectorAll('.zoomonly').forEach(function(t){t.style.display=vb[2]<400?'':'none'});
+    svg.querySelectorAll('.place.big text:not(.zoomonly)').forEach(function(t){t.style.display=vb[2]<400?'none':''});
+    pts.forEach(function(p){
+      var on=p.el.classList.contains('on');
+      p.el.querySelector('.hit').setAttribute('r',22*k);
+      p.el.querySelector('.mark').setAttribute('r',(on?10:8)*k);
+      p.el.querySelector('.dot').setAttribute('r',2.5*k);
+      var t=p.el.querySelector('.lbl');
+      t.setAttribute('x',p.x+p.dx*k);t.setAttribute('y',p.y+p.dy*k+4*k);
+      t.style.fontSize=(13*k)+'px';t.style.strokeWidth=(3*k)+'px';
+      t.style.display=p.r.indexOf(cur)>-1?'':'none';
+    });
+  }
+  function setVB(target){
+    var from=vb.slice(),t0=performance.now(),D=matchMedia('(prefers-reduced-motion: reduce)').matches?0:600;
+    cancelAnimationFrame(anim);
+    (function step(now){
+      var t=D?Math.min(1,(now-t0)/D):1,e=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+      vb=from.map(function(v,i){return v+(target[i]-v)*e});
+      svg.setAttribute('viewBox',vb.join(' '));scaleUI();
+      if(t<1)anim=requestAnimationFrame(step);
+    })(performance.now());
+    // garante o enquadramento final mesmo se a animação for interrompida
+    clearTimeout(setVB.t);setVB.t=setTimeout(function(){cancelAnimationFrame(anim);vb=target.slice();svg.setAttribute('viewBox',vb.join(' '));scaleUI()},D+80);
+  }
+  function show(p){
+    pts.forEach(function(q){q.el.classList.toggle('on',q===p)});
+    var img=document.getElementById('p-img');
+    if(p.img){img.src=p.img;img.alt=p.cap;img.hidden=false}else{img.hidden=true;img.removeAttribute('src')}
+    document.getElementById('p-cap').textContent=p.cap;
+    document.getElementById('p-kind').textContent=p.kind;
+    document.getElementById('p-name').textContent=p.name;
+    document.getElementById('p-txt').textContent=p.txt;
+    document.getElementById('p-kv').innerHTML=p.kv.map(function(k){return '<dt>'+k[0]+'</dt><dd>'+k[1]+'</dd>'}).join('');
+    [].forEach.call(document.getElementById('stops').children,function(b){b.setAttribute('aria-current',b.dataset.id===p.id)});
+    scaleUI();
+  }
+  function route(r){
+    cur=r;
+    Object.keys(R).forEach(function(k){
+      document.getElementById('b-'+k).setAttribute('aria-pressed',k===r);
+      document.getElementById('r-'+k).style.opacity=k===r?1:.12;
+    });
+    pts.forEach(function(p){p.el.style.opacity=p.r.indexOf(r)>-1?1:.3});
+    document.getElementById('zoomhint').textContent=R[r].hint;
+    document.getElementById('bar-name').textContent=R[r].name;
+    document.getElementById('bar-btn').href='https://wa.me/5500000000000?text='+encodeURIComponent('Olá! Quero reservar o passeio '+R[r].name+' na El Soñador.');
+    document.getElementById('stops').innerHTML=R[r].stops.map(function(id){return '<button type="button" data-id="'+id+'">'+(byId[id].short||byId[id].name)+'</button>'}).join('');
+    [].forEach.call(document.getElementById('stops').children,function(b){b.addEventListener('click',function(){show(byId[b.dataset.id])})});
+    setVB(R[r].vb);
+    show(byId[R[r].stops[0]]);
+  }
+  Object.keys(R).forEach(function(k){document.getElementById('b-'+k).addEventListener('click',function(){route(k)})});
+  addEventListener('resize',scaleUI);
+  route('nit');
+})();
+</script>

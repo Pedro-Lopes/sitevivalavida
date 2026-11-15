@@ -1,0 +1,210 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>html,body{margin:0}body{-webkit-text-size-adjust:100%}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Viva la Vida · Stories</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap">
+<style>
+/* Layout: o site é o link da bio — o passeio contado em stories que passam sozinhos, destaques para pular de cena e botões de contato logo abaixo. Visual único (noite azul da El Soñador). */
+:root{
+  --bg:#0a1230;
+  --bg2:#121c46;
+  --ink:#f4f6ff;
+  --muted:#a7b0d6;
+  --led:#4656ff;
+  --sun:#ffcf5c;
+  --display:"Syne","Arial Black",Arial,sans-serif;
+  --body:"DM Sans","Segoe UI",Arial,sans-serif;
+  color-scheme:dark;
+}
+body{background:radial-gradient(120% 80% at 50% 0%,var(--bg2),var(--bg) 60%);background-color:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;min-height:100%}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.layout{display:grid;grid-template-columns:1fr 380px 1fr;gap:40px;align-items:center;padding-block:40px}
+.layout > *{min-width:0}
+.side h1{font-family:var(--display);font-weight:800;font-size:clamp(40px,5vw,64px);line-height:.95;margin:8px 0 14px;text-wrap:balance}
+.side h1 span{color:var(--sun)}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.side p{color:var(--muted);margin:0 0 10px}
+.side ul{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+.side li{display:flex;gap:10px;align-items:baseline}
+.side li b{font-family:var(--display);color:var(--sun);font-size:20px;min-width:3ch}
+
+/* perfil + destaques */
+.profile{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.avatar{width:58px;height:58px;border-radius:50%;padding:3px;background:conic-gradient(var(--sun),var(--led),var(--sun));flex:none}
+.avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover;border:3px solid var(--bg);display:block}
+.profile b{display:block;font-family:var(--display);font-size:18px}
+.profile small{color:var(--muted)}
+.highlights{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px;scrollbar-width:none}
+.hl{background:none;border:0;color:var(--ink);font:inherit;font-size:12px;display:grid;justify-items:center;gap:6px;cursor:pointer;padding:0;flex:none}
+.hl span.ring{width:56px;height:56px;border-radius:50%;border:2px solid var(--muted);padding:2px;display:block}
+.hl.on span.ring{border-color:var(--sun)}
+.hl img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+.hl:focus-visible span.ring{outline:2px solid var(--sun);outline-offset:2px}
+
+/* o story */
+.story{position:relative;aspect-ratio:9/16;max-width:100%;border-radius:22px;overflow:hidden;background:#000;box-shadow:0 40px 80px -30px rgba(70,86,255,.55);user-select:none;-webkit-user-select:none}
+.slide{position:absolute;inset:0;opacity:0;transition:opacity .35s}
+.slide.on{opacity:1}
+.slide img{width:100%;height:100%;object-fit:cover;display:block}
+.slide .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.45) 0,rgba(0,0,0,0) 22%,rgba(0,0,0,0) 50%,rgba(0,0,0,.75) 100%)}
+.slide .txt{position:absolute;left:18px;right:18px;bottom:76px}
+.slide h2{font-family:var(--display);font-weight:800;font-size:30px;line-height:1;margin:0 0 8px;text-wrap:balance}
+.slide p{margin:0;font-size:15px;color:#e6e9ff}
+.sticker{position:absolute;display:inline-block;font-family:var(--display);font-weight:800;font-size:15px;padding:8px 12px;border-radius:10px;transform:rotate(-4deg)}
+.sticker.y{background:var(--sun);color:#1a1530}
+.sticker.b{background:var(--led);color:#fff;transform:rotate(3deg)}
+.sticker.w{background:#fff;color:#0a1230}
+.bars{position:absolute;top:10px;left:10px;right:10px;display:flex;gap:4px;z-index:3}
+.bars i{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.35);overflow:hidden}
+.bars i b{display:block;height:100%;width:0;background:#fff}
+.head{position:absolute;top:22px;left:12px;right:12px;display:flex;align-items:center;gap:8px;z-index:3;font-size:13px;font-weight:700}
+.head img{width:28px;height:28px;border-radius:50%;object-fit:cover}
+.head small{font-weight:400;opacity:.8}
+.head button{margin-left:auto;background:rgba(0,0,0,.35);border:0;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:14px}
+.tap{position:absolute;top:60px;bottom:70px;width:40%;z-index:2;background:none;border:0;cursor:pointer}
+.tap.l{left:0}.tap.r{right:0;width:60%}
+.tap:focus-visible{outline:2px solid var(--sun);outline-offset:-4px}
+.reply{position:absolute;left:12px;right:12px;bottom:14px;z-index:3;display:flex;gap:8px}
+.reply a{flex:1;text-align:center;background:var(--ink);color:var(--bg);text-decoration:none;font-weight:700;border-radius:999px;padding:12px;font-size:14px}
+.reply a:hover,.reply a:focus-visible{background:var(--sun);outline:none}
+
+/* link da bio */
+.bio{padding-block:20px 72px}
+.bio h3{font-family:var(--display);font-weight:800;font-size:28px;margin:0 0 16px;text-align:center}
+.links{display:grid;gap:12px;max-width:520px;margin:0 auto}
+.links a,.links div{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 20px;border-radius:16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:var(--ink);text-decoration:none;font-weight:700}
+.links a:hover,.links a:focus-visible{background:var(--led);border-color:var(--led);outline:none}
+.links small{font-weight:400;color:var(--muted);display:block}
+.links a:hover small{color:#dfe3ff}
+.links .main{background:var(--sun);color:#1a1530;border-color:var(--sun)}
+.links .main small{color:#4a3d1a}
+.links .main:hover{background:#fff;border-color:#fff}
+
+@media (max-width:980px){
+  .layout{grid-template-columns:1fr;max-width:460px;margin:0 auto;padding-block:14px 8px;gap:28px}
+  .side.left{order:2}
+  .side.right{order:3}
+  .side h1{font-size:clamp(34px,10vw,48px)}
+  /* no celular o story ocupa a tela: cabe inteiro sem rolar */
+  .story{height:min(calc(100svh - 190px),calc((100vw - 32px) * 16 / 9));width:auto;aspect-ratio:9/16;margin:0 auto;border-radius:18px}
+  .profile{margin-bottom:10px}
+  .avatar{width:48px;height:48px}
+  .hl span.ring{width:52px;height:52px}
+  .highlights{margin-inline:calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding-inline:max(16px,env(safe-area-inset-left,0px));margin-bottom:10px}
+  .slide h2{font-size:clamp(24px,7.5vw,30px)}
+  .reply a{padding:14px}
+  .bio{padding-block:8px 48px}
+  .links a{padding:16px;min-height:56px}
+}
+@media (prefers-reduced-motion:reduce){.slide{transition:none}}
+</style>
+
+<main class="wrap">
+  <div class="layout">
+    <div class="side left">
+      <div class="eyebrow">Passeios de lancha · Niterói e Rio</div>
+      <h1>O passeio inteiro em <span>um minuto</span></h1>
+      <p>Assista como no celular. Toque na direita para avançar e na esquerda para voltar. Segure para pausar.</p>
+    </div>
+
+    <div>
+      <div class="profile">
+        <div class="avatar"><img src="img/principal.jpg" alt=""></div>
+        <div><b>Viva la Vida</b><small>Lancha El Soñador · 36 pés · 5 horas de passeio</small></div>
+      </div>
+      <div class="highlights" id="hls" aria-label="Destaques"></div>
+      <div class="story" id="story" aria-roledescription="stories" aria-live="polite">
+        <div class="bars" id="bars"></div>
+        <div class="head"><img src="img/principal.jpg" alt=""><span>vivalavida <small id="ago">agora</small></span><button type="button" id="pause" aria-label="Pausar">❚❚</button></div>
+        <div id="slides"></div>
+        <button type="button" class="tap l" id="prev" aria-label="Story anterior"></button>
+        <button type="button" class="tap r" id="next" aria-label="Próximo story"></button>
+        <div class="reply"><a href="https://wa.me/5500000000000" target="_blank" rel="noopener" id="reply">Quero esse passeio</a></div>
+      </div>
+    </div>
+
+    <div class="side right">
+      <div class="eyebrow">Em cada passeio</div>
+      <ul style="margin-top:12px">
+        <li><b>5h</b><span>de passeio pela Baía de Guanabara</span></li>
+        <li><b>2</b><span>tripulantes: capitão e marinheiro</span></li>
+        <li><b>36'</b><span>de lancha, com flybridge</span></li>
+        <li><b>+</b><span>kit churrasco incluso</span></li>
+        <li><b>$</b><span>drinks opcionais, cobrados à parte</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <section class="bio">
+    <h3>Links</h3>
+    <div class="links">
+      <a class="main" href="https://wa.me/5500000000000" target="_blank" rel="noopener"><span>Reservar pelo WhatsApp<small>(00) 00000-0000 · resposta no mesmo dia</small></span><span>→</span></a>
+      <a href="https://wa.me/5500000000000?text=Ol%C3%A1!%20Quero%20o%20roteiro%20saindo%20de%20Niter%C3%B3i." target="_blank" rel="noopener"><span>Saindo de Niterói<small>Jurujuba → Praia Vermelha ou Urca → Ponta do Morcego → Jurujuba</small></span><span>→</span></a>
+      <a href="https://wa.me/5500000000000?text=Ol%C3%A1!%20Quero%20o%20roteiro%20saindo%20do%20Rio." target="_blank" rel="noopener"><span>Saindo do Rio<small>Urca → Praia Vermelha → Jurujuba → Urca</small></span><span>→</span></a>
+      <a href="https://wa.me/5500000000000?text=Ol%C3%A1!%20Quero%20saber%20do%20pacote%20de%20ilhas." target="_blank" rel="noopener"><span>Ilhas oceânicas · a combinar<small>Tijucas, Cagarras, Rasa, Redonda, Maricás e Itaipu</small></span><span>→</span></a>
+      <a href="https://wa.me/5500000000000?text=Ol%C3%A1!%20Quero%20saber%20do%20pacote%20de%20praias." target="_blank" rel="noopener"><span>Praias de Niterói · a combinar<small>Itaipu, Piratininga, Forte do Rio Branco e Imbuí</small></span><span>→</span></a>
+      <a href="https://wa.me/5500000000000?text=Ol%C3%A1!%20Pode%20me%20mandar%20o%20card%C3%A1pio%20de%20drinks%3F" target="_blank" rel="noopener"><span>Cardápio de drinks<small>opcional, valor à parte</small></span><span>→</span></a>
+    </div>
+  </section>
+</main>
+
+<script>
+(function(){
+  var S=[
+    {hl:'Lancha',img:'img/principal.jpg',pos:'60% 50%',t:'Essa é a El Soñador',p:'36 pés, flybridge e o Cristo de testemunha.',st:[['y','36 pés','top:90px;left:18px']]},
+    {hl:'Embarque',img:'img/lancha.jpg',pos:'50% 50%',t:'Embarque em Jurujuba ou na Urca',p:'Capitão e marinheiro já esperando no píer.',st:[['w','Niterói ou Rio','top:96px;right:18px']]},
+    {hl:'Roteiro',img:'img/principal.jpg',pos:'15% 50%',t:'Pão de Açúcar visto do mar',p:'Jurujuba → Praia Vermelha ou Urca → Ponta do Morcego.',st:[['b','5 horas','top:96px;left:18px']]},
+    {hl:'Flutuante',img:'img/flutuante.jpg',pos:'50% 40%',t:'Ancora, joga o flutuante e pronto',p:'Parada para banho em água calma.',st:[['y','hora do mergulho','top:120px;right:18px']]},
+    {hl:'Churrasco',img:'img/churrasco.jpg',pos:'50% 60%',t:'Churrasco na popa',p:'Kit churrasco incluso. Drinks opcionais à parte.',st:[['w','kit incluso','top:100px;left:18px'],['b','+ drinks','top:146px;left:40px']]},
+    {hl:'Noite',img:'img/noite.jpg',pos:'50% 60%',t:'E à noite ela fica azul',p:'Aniversários e comemorações a bordo.',st:[['b','modo festa','top:100px;right:18px']]}
+  ];
+  var DUR=5000,i=0,t0=0,elapsed=0,paused=false,raf=null;
+  var slides=document.getElementById('slides'),bars=document.getElementById('bars'),hls=document.getElementById('hls');
+  S.forEach(function(s,k){
+    var d=document.createElement('div');d.className='slide';
+    d.innerHTML='<img src="'+s.img+'" alt="" style="object-position:'+s.pos+'"><div class="shade"></div>'+
+      s.st.map(function(x){return '<span class="sticker '+x[0]+'" style="'+x[2]+'">'+x[1]+'</span>'}).join('')+
+      '<div class="txt"><h2>'+s.t+'</h2><p>'+s.p+'</p></div>';
+    slides.appendChild(d);
+    var b=document.createElement('i');b.innerHTML='<b></b>';bars.appendChild(b);
+    var h=document.createElement('button');h.type='button';h.className='hl';
+    h.innerHTML='<span class="ring"><img src="'+s.img+'" alt="" style="object-position:'+s.pos+'"></span>'+s.hl;
+    h.addEventListener('click',function(){go(k)});hls.appendChild(h);
+  });
+  function go(k){
+    i=(k+S.length)%S.length;elapsed=0;t0=performance.now();
+    [].forEach.call(slides.children,function(el,j){el.classList.toggle('on',j===i)});
+    [].forEach.call(bars.children,function(el,j){el.firstChild.style.width=j<i?'100%':'0'});
+    [].forEach.call(hls.children,function(el,j){el.classList.toggle('on',j===i)});
+    slides.children[i].setAttribute('aria-label',S[i].t);
+  }
+  function loop(now){
+    if(!paused){
+      var e=elapsed+(now-t0);
+      bars.children[i].firstChild.style.width=Math.min(100,e/DUR*100)+'%';
+      if(e>=DUR){go(i+1)}
+    }
+    raf=requestAnimationFrame(loop);
+  }
+  function setPause(p){
+    if(p===paused)return;
+    if(p){elapsed+=performance.now()-t0}else{t0=performance.now()}
+    paused=p;document.getElementById('pause').textContent=p?'▶':'❚❚';
+    document.getElementById('pause').setAttribute('aria-label',p?'Continuar':'Pausar');
+  }
+  var justHeld=false;
+  document.getElementById('next').addEventListener('click',function(){if(justHeld){justHeld=false;return}go(i+1)});
+  document.getElementById('prev').addEventListener('click',function(){if(justHeld){justHeld=false;return}go(i-1)});
+  document.getElementById('pause').addEventListener('click',function(){setPause(!paused)});
+  var story=document.getElementById('story'),holdT=null,held=false;
+  story.addEventListener('pointerdown',function(e){if(e.target.closest('a,#pause'))return;holdT=setTimeout(function(){held=true;setPause(true)},250)});
+  story.addEventListener('pointerup',function(){clearTimeout(holdT);if(held){held=false;justHeld=true;setPause(false)}});
+  story.addEventListener('pointerleave',function(){clearTimeout(holdT);if(held){held=false;setPause(false)}});
+  document.addEventListener('keydown',function(e){if(e.key==='ArrowRight')go(i+1);if(e.key==='ArrowLeft')go(i-1)});
+  var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  go(0);
+  if(reduce){setPause(true)}
+  raf=requestAnimationFrame(loop);
+})();
+</script>
