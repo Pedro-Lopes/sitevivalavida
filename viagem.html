@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Viva la Vida · A Viagem</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Figtree:wght@400;500;700&display=swap">
+<style>
+/* Layout (celular primeiro): mapa da baía preso no topo; ao rolar, a lancha navega pela rota e cada parada traz sua foto. */
+:root{
+  --sea:#0f4c6e;
+  --sea2:#0a3550;
+  --land:#f1ead8;
+  --ink:#0b2233;
+  --paper:#ffffff;
+  --muted:#5a7080;
+  --coral:#ff6b4a;
+  --foam:#d8eef6;
+  --display:"Bricolage Grotesque","Arial Black",Arial,sans-serif;
+  --body:"Figtree","Segoe UI",Arial,sans-serif;
+  color-scheme:light;
+}
+html,body{margin:0}
+img{max-width:100%;display:block}
+[hidden]{display:none!important}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-text-size-adjust:100%;padding-bottom:calc(80px + env(safe-area-inset-bottom,0px))}
+.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+.intro{padding-block:max(24px,env(safe-area-inset-top,0px)) 20px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(40px,12vw,84px);line-height:.92;margin:8px 0 12px;letter-spacing:-.02em;text-wrap:balance}
+h1 span{color:var(--coral)}
+.intro p{margin:0;max-width:44ch;color:var(--muted)}
+.hint{display:inline-flex;align-items:center;gap:8px;margin-top:16px;font-weight:700;font-size:14px;color:var(--sea)}
+.hint i{font-style:normal;display:inline-block;animation:bob 1.4s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(5px)}}
+
+/* mapa preso */
+.stage{position:sticky;top:0;z-index:5;height:44svh;min-height:260px;background:var(--sea);overflow:hidden;box-shadow:0 10px 30px -18px rgba(0,0,0,.6)}
+.stage svg{width:100%;height:100%;display:block}
+.lbl{font-family:var(--body);font-weight:700;fill:var(--ink);font-size:5.2px}
+.lbl.w{fill:#fff;font-weight:500;font-size:4.4px;opacity:.85}
+.lbl.big{font-family:var(--display);font-weight:800;fill:#b9ab84;font-size:7px;letter-spacing:1px}
+.hud{position:absolute;left:12px;right:12px;top:calc(10px + env(safe-area-inset-top,0px));display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none}
+.clock{background:rgba(255,255,255,.92);border-radius:12px;padding:6px 10px;font-family:var(--display);font-weight:800;font-size:22px;line-height:1;font-variant-numeric:tabular-nums}
+.clock small{display:block;font-family:var(--body);font-weight:500;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.where{background:var(--coral);color:#fff;border-radius:999px;padding:6px 12px;font-weight:700;font-size:13px;max-width:60%;text-align:right}
+.prog{position:absolute;left:0;bottom:0;height:4px;background:var(--coral);width:0}
+
+/* paradas */
+.steps{position:relative}
+.step{min-height:68svh;display:flex;align-items:center;padding-block:28px}
+.card{width:100%;max-width:520px;margin:0 auto;background:var(--paper);border-radius:20px;overflow:hidden;box-shadow:0 20px 50px -25px rgba(11,34,51,.45);border:1px solid #e3ebef}
+.card img{width:100%;aspect-ratio:4/3;object-fit:cover}
+.card .tx{padding:16px 18px 20px}
+.tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--coral)}
+.card h2{font-family:var(--display);font-weight:800;font-size:28px;line-height:1.02;margin:6px 0 8px;text-wrap:balance}
+.card p{margin:0;color:var(--muted)}
+
+.after{padding-block:40px 32px;background:var(--foam)}
+.after h2{font-family:var(--display);font-weight:800;font-size:clamp(30px,8vw,48px);line-height:1;margin:0 0 14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:640px}
+.grid div{background:var(--paper);border-radius:14px;padding:14px}
+.grid b{display:block;font-family:var(--display);font-weight:800;font-size:28px;line-height:1}
+.grid small{color:var(--muted)}
+.more{margin-top:20px;max-width:640px;display:grid;gap:10px}
+.more div{background:var(--paper);border-radius:14px;padding:14px 16px}
+.more b{display:block}
+.more span{color:var(--muted);font-size:15px}
+.alt{margin-top:18px;max-width:640px;font-size:15px}
+
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;gap:12px;align-items:center;padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));background:var(--ink);color:#fff}
+.bar span{flex:1;min-width:0;font-size:13px;line-height:1.3;opacity:.8}
+.bar span b{display:block;font-size:16px;opacity:1}
+.bar a{background:var(--coral);color:#fff;text-decoration:none;font-weight:700;padding:14px 20px;border-radius:999px;white-space:nowrap}
+.bar a:focus-visible{outline:2px solid #fff;outline-offset:3px}
+
+@media (min-width:900px){
+  body{padding-bottom:0}
+  .layout{display:grid;grid-template-columns:1.1fr 1fr}
+  .stage{height:100svh;grid-column:1;grid-row:1}
+  .steps{grid-column:2;grid-row:1;padding-inline:32px}
+  .step{min-height:90svh}
+  .bar{position:sticky;bottom:0}
+}
+@media (prefers-reduced-motion:reduce){.hint i{animation:none}}
+</style>
+</head>
+<body>
+
+<header class="intro wrap">
+  <div class="eyebrow">Viva la Vida · lancha El Soñador</div>
+  <h1>Role e <span>navegue</span> com a gente</h1>
+  <p>O passeio saindo de Niterói, parada por parada. Cada vez que você rola, a lancha avança na baía.</p>
+  <div class="hint"><i>↓</i> Comece a rolar</div>
+</header>
+
+<div class="layout">
+  <div class="stage" aria-hidden="true">
+    <svg id="map" viewBox="294 58 140 122" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#14608a"/><stop offset="1" stop-color="#0a3550"/></linearGradient>
+      </defs>
+      <rect x="0" y="0" width="880" height="460" fill="url(#sea)"/>
+      <!-- Rio -->
+      <path d="M0 0H330L322 60L312 100L300 122L318 132L332 140L336 150L322 158L300 162L288 172L276 186L258 200L0 262Z" fill="var(--land)"/>
+      <!-- Pão de Açúcar e Morro da Urca -->
+      <path d="M322 140c3-9 8-13 12-12c4 1 5 9 3 16z" fill="#c9bc93"/>
+      <path d="M308 128c3-6 9-8 12-5c2 3 0 8-3 10z" fill="#d8cca6"/>
+      <!-- Niterói -->
+      <path d="M395 0L392 40L398 70L404 92L392 104L378 112L370 120L388 128L410 134L440 140L470 146L500 154L530 168L552 186L880 164V0Z" fill="var(--land)"/>
+      <!-- marolas -->
+      <g stroke="#fff" stroke-opacity=".18" fill="none" stroke-width=".6">
+        <path d="M340 70q4-2 8 0t8 0M352 175q4-2 8 0t8 0M290 178q4-2 8 0t8 0M420 160q4-2 8 0t8 0M360 120q4-2 8 0t8 0"/>
+      </g>
+      
+      <text class="lbl big" x="401" y="68">NITERÓI</text>
+      <text class="lbl w" x="334" y="104">Baía de Guanabara</text>
+      <!-- rota completa e rastro -->
+      <path id="route" d="M402 86C384 118 354 148 334 156C352 136 372 114 388 104L402 86" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="1" stroke-dasharray="2.5 2"/>
+      <path id="wake" d="M402 86C384 118 354 148 334 156C352 136 372 114 388 104L402 86" fill="none" stroke="var(--coral)" stroke-width="1.4" stroke-linecap="round"/>
+      <!-- paradas -->
+      <g id="stops"></g>
+      <!-- lancha vista de cima -->
+      <g id="boat">
+        <path d="M-6 -2.4L3 -2.4Q7 -2.4 8 0Q7 2.4 3 2.4L-6 2.4Z" fill="#fff" stroke="#0b2233" stroke-width=".5"/>
+        <rect x="-3" y="-1.5" width="5" height="3" rx=".8" fill="#0b2233"/>
+        <path d="M-6 -1.8l-3 -.6M-6 1.8l-3 .6" stroke="#fff" stroke-width=".5" stroke-opacity=".7"/>
+      </g>
+    </svg>
+    <div class="hud">
+      <div class="clock"><small>tempo de passeio</small><span id="clock">0h00</span></div>
+      <div class="where" id="where">Jurujuba</div>
+    </div>
+    <div class="prog" id="prog"></div>
+  </div>
+
+  <div class="steps wrap" id="steps">
+    <section class="step" data-at="0" data-t="0" data-place="Jurujuba">
+      <div class="card"><img src="img/lancha.jpg" alt="Lancha El Soñador atracada no píer" loading="lazy"><div class="tx"><span class="tag">Embarque</span><h2>Todo mundo a bordo em Jurujuba</h2><p>O capitão e o marinheiro recebem o grupo no píer, mostram a lancha e explicam a segurança. Coolers no lugar, som ligado, e a gente solta as amarras.</p></div></div>
+    </section>
+    <section class="step" data-at="0.56" data-t="1.25" data-place="Praia Vermelha">
+      <div class="card"><img src="img/principal.jpg" alt="El Soñador navegando com o Cristo Redentor ao fundo" loading="lazy"><div class="tx"><span class="tag">Travessia</span><h2>O Pão de Açúcar de frente</h2><p>Cruzamos a entrada da baía até a Praia Vermelha ou a Urca. Do flybridge, o Rio inteiro aparece: Pão de Açúcar, Cristo e a orla.</p></div></div>
+    </section>
+    <section class="step" data-at="0.84" data-t="2.25" data-place="Ponta do Morcego">
+      <div class="card"><img src="img/flutuante.jpg" alt="Amigos no tapete flutuante perto da praia" loading="lazy"><div class="tx"><span class="tag">Parada para banho</span><h2>Âncora na Ponta do Morcego</h2><p>Água calma, tapete flutuante na água e tempo livre para nadar e boiar sem pressa.</p></div></div>
+    </section>
+    <section class="step" data-at="0.86" data-t="3.25" data-place="Ponta do Morcego">
+      <div class="card"><img src="img/churrasco.jpg" alt="Picanha na churrasqueira presa à popa" loading="lazy"><div class="tx"><span class="tag">Kit churrasco incluso</span><h2>Brasa acesa na popa</h2><p>Com a lancha ancorada, a churrasqueira vai para fora da popa. Se quiser, peça o cardápio de drinks (cobrado à parte).</p></div></div>
+    </section>
+    <section class="step" data-at="1" data-t="5" data-place="De volta a Jurujuba">
+      <div class="card"><img src="img/noite.jpg" alt="Popa da El Soñador iluminada de azul" loading="lazy"><div class="tx"><span class="tag">Volta</span><h2>Cinco horas depois, de volta ao píer</h2><p>Se o passeio for no fim do dia, a volta é com as luzes da cidade acesas e a popa iluminada de azul.</p></div></div>
+    </section>
+  </div>
+</div>
+
+<section class="after wrap">
+  <h2>O que vem no passeio</h2>
+  <div class="grid">
+    <div><b>5h</b><small>de passeio</small></div>
+    <div><b>36'</b><small>lancha com flybridge</small></div>
+    <div><b>2</b><small>capitão e marinheiro</small></div>
+    <div><b>1</b><small>kit churrasco incluso</small></div>
+  </div>
+  <div class="more">
+    <div><b>Saindo do Rio?</b><span>Embarque na Urca: Urca → Praia Vermelha → Jurujuba → Urca.</span></div>
+    <div><b>Ilhas oceânicas · a combinar</b><span>Tijucas, Cagarras, Rasa, Redonda, Maricás e Itaipu.</span></div>
+    <div><b>Praias de Niterói · a combinar</b><span>Itaipu, Piratininga, Forte do Rio Branco e Imbuí.</span></div>
+  </div>
+  <p class="alt">Cardápio de drinks opcional, cobrado à parte. WhatsApp: (00) 00000-0000</p>
+</section>
+
+<div class="bar"><span><b>Gostou da viagem?</b>5h de passeio na El Soñador</span><a href="https://wa.me/5500000000000" target="_blank" rel="noopener">Reservar</a></div>
+
+<script>
+(function(){
+  var ns='http://www.w3.org/2000/svg';
+  var route=document.getElementById('route'),wake=document.getElementById('wake'),boat=document.getElementById('boat');
+  var L=route.getTotalLength();
+  wake.style.strokeDasharray=L;wake.style.strokeDashoffset=L;
+  var stops=[[402,86,'Jurujuba',-4,-2],[334,156,'Praia Vermelha',4,6],[388,104,'Ponta do Morcego',-4,-3]];
+  var sg=document.getElementById('stops');
+  stops.forEach(function(s){
+    var c=document.createElementNS(ns,'circle');c.setAttribute('cx',s[0]);c.setAttribute('cy',s[1]);c.setAttribute('r',2.2);c.setAttribute('fill','#fff');c.setAttribute('stroke','#0b2233');c.setAttribute('stroke-width','.6');sg.appendChild(c);
+    var t=document.createElementNS(ns,'text');t.setAttribute('x',s[0]+s[3]);t.setAttribute('y',s[1]+s[4]);t.setAttribute('class','lbl');t.setAttribute('text-anchor',s[3]<0?'end':'start');t.textContent=s[2];
+    t.setAttribute('paint-order','stroke');t.setAttribute('stroke','#f1ead8');t.setAttribute('stroke-width','1.4');sg.appendChild(t);
+  });
+  var steps=[].slice.call(document.querySelectorAll('.step'));
+  // posição exata de cada parada ao longo da rota
+  function nearest(x,y){var best=0,bd=1e9;for(var d=0;d<=L;d+=0.5){var p=route.getPointAtLength(d),dd=(p.x-x)*(p.x-x)+(p.y-y)*(p.y-y);if(dd<bd){bd=dd;best=d}}return best/L}
+  steps[1].dataset.at=nearest(334,156);
+  steps[2].dataset.at=nearest(388,104)-0.02;
+  steps[3].dataset.at=nearest(388,104);
+  function fmt(h){var H=Math.floor(h),m=Math.round((h-H)*60);if(m===60){H++;m=0}return H+'h'+(m<10?'0':'')+m}
+  function place(f){
+    f=Math.max(0,Math.min(1,f));
+    var d=f*L,p=route.getPointAtLength(d),q=route.getPointAtLength(Math.min(L,d+0.6)),r=route.getPointAtLength(Math.max(0,d-0.6));
+    var a=Math.atan2(q.y-r.y,q.x-r.x)*180/Math.PI;
+    boat.setAttribute('transform','translate('+p.x+' '+p.y+') rotate('+a+')');
+    wake.style.strokeDashoffset=L-d;
+  }
+  function update(){
+    var y=innerHeight*0.55,i=0;
+    // encontra entre quais paradas está o meio da tela
+    var c=steps.map(function(s){var r=s.getBoundingClientRect();return r.top+r.height/2});
+    var at,tt,pl;
+    if(y<=c[0]){at=+steps[0].dataset.at;tt=+steps[0].dataset.t;pl=steps[0].dataset.place}
+    else if(y>=c[c.length-1]){var s=steps[steps.length-1];at=+s.dataset.at;tt=+s.dataset.t;pl=s.dataset.place}
+    else{
+      for(i=0;i<c.length-1;i++){if(y>=c[i]&&y<c[i+1])break}
+      var k=(y-c[i])/(c[i+1]-c[i]),a=steps[i],b=steps[i+1];
+      at=+a.dataset.at+(+b.dataset.at-a.dataset.at)*k;
+      tt=+a.dataset.t+(+b.dataset.t-a.dataset.t)*k;
+      pl=k<.5?a.dataset.place:b.dataset.place;
+    }
+    place(at);
+    document.getElementById('clock').textContent=fmt(tt);
+    document.getElementById('where').textContent=pl;
+    document.getElementById('prog').style.width=(tt/5*100)+'%';
+  }
+  addEventListener('scroll',update,{passive:true});addEventListener('resize',update);update();
+})();
+</script>
+</body>
+</html>

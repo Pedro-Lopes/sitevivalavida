@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Viva la Vida · Diário de Bordo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Courier+Prime:wght@400;700&family=Libre+Franklin:wght@400;600&display=swap">
+<style>
+/* Layout (celular primeiro): o site é o caderno do capitão — linhas azuis, margem vermelha, anotações à mão por hora, fotos coladas com fita e carimbos de cada parada. Visual único por escolha. */
+:root{
+  --desk:#2a3b47;
+  --paper:#fdfcf8;
+  --rule:#bcd3e3;
+  --margin:#e37b7b;
+  --pen:#1f3a93;
+  --pencil:#3d3d3d;
+  --stamp:#c0392b;
+  --tape:rgba(235,225,180,.82);
+  --hand:"Caveat","Segoe Print","Bradley Hand",cursive;
+  --type:"Courier Prime","Courier New",monospace;
+  --body:"Libre Franklin","Segoe UI",Arial,sans-serif;
+  color-scheme:light;
+}
+html,body{margin:0}
+img{max-width:100%;display:block}
+[hidden]{display:none!important}
+body{background:var(--desk);color:var(--pencil);font-family:var(--body);-webkit-text-size-adjust:100%;padding:max(14px,env(safe-area-inset-top,0px)) max(10px,env(safe-area-inset-right,0px)) calc(92px + env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px))}
+
+.book{max-width:620px;margin:0 auto;display:grid;gap:18px}
+.page{position:relative;background:var(--paper);border-radius:4px 10px 10px 4px;box-shadow:0 18px 40px -20px rgba(0,0,0,.6);padding:26px 18px 30px 48px;
+  background-image:linear-gradient(90deg,transparent 36px,var(--margin) 36px,var(--margin) 37.5px,transparent 37.5px),repeating-linear-gradient(transparent 0 31px,var(--rule) 31px 32px);
+  background-position:0 0,0 18px;line-height:32px;overflow:hidden}
+.page::before{content:"";position:absolute;left:12px;top:0;bottom:0;width:10px;background:radial-gradient(circle at 5px 16px,var(--desk) 4px,transparent 4.5px) 0 0/10px 64px repeat-y;opacity:.85}
+
+/* capa */
+.cover{background:#183447;color:#f3eedd;padding:30px 22px 34px;border-radius:4px 12px 12px 4px;box-shadow:0 18px 40px -20px rgba(0,0,0,.7);position:relative;overflow:hidden;
+  background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.025) 0 2px,transparent 2px 6px)}
+.cover .label{border:2px solid #d9c98f;padding:16px 16px 18px;text-align:center;max-width:330px;margin:0 auto;background:rgba(0,0,0,.12)}
+.cover small{font-family:var(--type);letter-spacing:.18em;text-transform:uppercase;font-size:11px;color:#d9c98f}
+.cover h1{font-family:var(--type);font-weight:700;font-size:clamp(30px,9vw,44px);line-height:1;margin:10px 0 8px;letter-spacing:.02em}
+.cover .boat{font-family:var(--hand);font-size:34px;line-height:1;color:#fff}
+.fields{margin:22px auto 0;max-width:330px;font-family:var(--type);font-size:13px;display:grid;gap:6px}
+.fields div{display:flex;gap:8px;border-bottom:1px dashed rgba(243,238,221,.4);padding-bottom:4px}
+.fields span{opacity:.65;min-width:96px}
+.fields b{font-family:var(--hand);font-size:22px;font-weight:700;line-height:1;color:#fff}
+
+/* registro */
+.ph-type{font-family:var(--type);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#7a8a96;line-height:32px}
+h2{font-family:var(--hand);font-weight:700;color:var(--pen);font-size:40px;line-height:32px;margin:0 0 0}
+.entry{display:grid;grid-template-columns:62px 1fr;gap:0 8px}
+.entry .t{font-family:var(--type);font-weight:700;font-size:14px;color:var(--pencil)}
+.entry .n{font-family:var(--hand);font-size:24px;color:var(--pen);line-height:32px}
+.entry .n em{font-style:normal;background:linear-gradient(transparent 55%,rgba(255,230,90,.7) 55%)}
+.meta{font-family:var(--type);font-size:12px;color:#7a8a96;line-height:32px}
+
+.polaroid{position:relative;background:#fff;padding:10px 10px 36px;box-shadow:0 8px 18px -8px rgba(0,0,0,.45);margin:20px auto 18px;max-width:300px;transform:rotate(-2.2deg)}
+.polaroid.r{transform:rotate(2deg)}
+.polaroid img{width:100%;aspect-ratio:1;object-fit:cover}
+.polaroid figcaption{position:absolute;left:0;right:0;bottom:4px;text-align:center;font-family:var(--hand);font-size:22px;color:var(--pencil);line-height:1.2}
+.polaroid::before{content:"";position:absolute;top:-12px;left:50%;width:90px;height:26px;margin-left:-45px;background:var(--tape);transform:rotate(-4deg);box-shadow:0 1px 2px rgba(0,0,0,.1)}
+
+.stamp{position:absolute;right:14px;top:18px;width:96px;height:96px;border-radius:50%;border:3px double var(--stamp);color:var(--stamp);display:grid;place-items:center;text-align:center;font-family:var(--type);font-weight:700;font-size:10px;line-height:1.15;letter-spacing:.08em;text-transform:uppercase;transform:rotate(14deg);opacity:.78;mix-blend-mode:multiply}
+.stamp b{display:block;font-size:13px}
+.stamp.l{right:auto;left:auto;right:22px;top:auto;bottom:24px;transform:rotate(-10deg)}
+
+.checks{list-style:none;padding:0;margin:0}
+.checks li{font-family:var(--hand);font-size:25px;color:var(--pen);line-height:32px}
+.checks li::before{content:"☑ ";color:var(--pencil)}
+.checks li.opt::before{content:"☐ "}
+.checks small{font-family:var(--type);font-size:12px;color:#7a8a96}
+.sign{font-family:var(--hand);font-size:34px;color:var(--pen);transform:rotate(-3deg);display:inline-block;margin-top:8px}
+.sign-line{border-top:1px solid var(--pencil);width:180px;font-family:var(--type);font-size:11px;color:#7a8a96;line-height:24px}
+
+.next{font-family:var(--hand);font-size:28px;color:var(--pen);line-height:32px}
+.next a{color:var(--stamp)}
+
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;gap:12px;align-items:center;padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));background:#183447;color:#f3eedd}
+.bar span{flex:1;min-width:0;font-family:var(--hand);font-size:24px;line-height:1.05}
+.bar span small{display:block;font-family:var(--type);font-size:11px;opacity:.7}
+.bar a{background:#f3eedd;color:#183447;text-decoration:none;font-family:var(--type);font-weight:700;font-size:14px;text-transform:uppercase;padding:14px 18px;border-radius:4px;white-space:nowrap}
+.bar a:focus-visible{outline:2px solid #fff;outline-offset:3px}
+</style>
+</head>
+<body>
+<main class="book">
+
+  <section class="cover">
+    <div class="label">
+      <small>Diário de bordo · nº 36</small>
+      <h1>VIVA LA VIDA</h1>
+      <div class="boat">lancha El Soñador</div>
+    </div>
+    <div class="fields">
+      <div><span>Embarcação</span><b>lancha 36 pés</b></div>
+      <div><span>Tripulação</span><b>capitão + marinheiro</b></div>
+      <div><span>Área</span><b>Baía de Guanabara</b></div>
+      <div><span>Duração</span><b>5 horas</b></div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="stamp"><div>porto de<b>Jurujuba</b>Niterói</div></div>
+    <div class="ph-type">Registro de viagem · folha 1</div>
+    <h2>Saída</h2>
+    <div class="entry"><span class="t">0h00</span><span class="n">Embarque em <em>Jurujuba</em>. Turma a bordo, coolers no lugar, coletes conferidos.</span></div>
+    <div class="entry"><span class="t">0h10</span><span class="n">Soltamos as amarras. Som ligado.</span></div>
+    <div class="meta">Vento: fraco · Mar: calmo · Céu: aberto</div>
+    <figure class="polaroid"><img src="img/lancha.jpg" alt="El Soñador atracada no píer" loading="lazy"><figcaption>a El Soñador esperando a gente</figcaption></figure>
+    <div class="ph-type">P.S. Saindo do Rio? Embarque na Urca.</div>
+  </section>
+
+  <section class="page">
+    <div class="stamp"><div>passagem<b>Pão de Açúcar</b>Rio</div></div>
+    <div class="ph-type">folha 2</div>
+    <h2>Travessia</h2>
+    <div class="entry"><span class="t">0h40</span><span class="n">Cruzamos a entrada da baía. Pão de Açúcar de frente.</span></div>
+    <div class="entry"><span class="t">1h00</span><span class="n">Parada na <em>Praia Vermelha</em> (ou Urca). Todo mundo no flybridge tirando foto.</span></div>
+    <figure class="polaroid r"><img src="img/principal.jpg" alt="El Soñador com o Cristo Redentor ao fundo" loading="lazy"><figcaption>o Cristo apareceu pra foto</figcaption></figure>
+  </section>
+
+  <section class="page">
+    <div class="stamp"><div>âncora<b>Ponta do Morcego</b>Niterói</div></div>
+    <div class="ph-type">folha 3</div>
+    <h2>Parada</h2>
+    <div class="entry"><span class="t">1h45</span><span class="n">Âncora na <em>Ponta do Morcego</em>. Tapete flutuante na água.</span></div>
+    <div class="entry"><span class="t">2h15</span><span class="n">Ninguém quer sair do flutuante.</span></div>
+    <figure class="polaroid"><img src="img/flutuante.jpg" alt="Amigos no tapete flutuante" loading="lazy"><figcaption>a turma boiando</figcaption></figure>
+    <div class="entry"><span class="t">2h45</span><span class="n">Brasa acesa na popa. <em>Kit churrasco</em> é por conta da casa.</span></div>
+    <figure class="polaroid r"><img src="img/churrasco.jpg" alt="Picanha na churrasqueira presa à popa" loading="lazy"><figcaption>picanha com vista</figcaption></figure>
+    <div class="entry"><span class="t">3h15</span><span class="n">Pedimos o cardápio de drinks. (à parte, mas valeu)</span></div>
+  </section>
+
+  <section class="page">
+    <div class="ph-type">folha 4</div>
+    <h2>Volta</h2>
+    <div class="entry"><span class="t">4h30</span><span class="n">Rumo a Jurujuba com o céu mudando de cor.</span></div>
+    <div class="entry"><span class="t">5h00</span><span class="n">Atracados. Popa acesa de azul. Já querendo voltar.</span></div>
+    <figure class="polaroid"><img src="img/noite.jpg" alt="Popa da El Soñador iluminada de azul" loading="lazy"><figcaption>a El Soñador de noite</figcaption></figure>
+    <div class="stamp l"><div>viagem<b>concluída</b>5 horas</div></div>
+  </section>
+
+  <section class="page">
+    <div class="ph-type">Anotações do capitão</div>
+    <h2>Já vem no pacote</h2>
+    <ul class="checks">
+      <li>1 capitão e 1 marinheiro</li>
+      <li>kit churrasco</li>
+      <li>5 horas de passeio</li>
+      <li>tapete flutuante nas paradas</li>
+      <li class="opt">drinks <small>opcional, à parte</small></li>
+    </ul>
+    <h2 style="margin-top:32px">Próximas viagens</h2>
+    <div class="entry"><span class="t">ilhas</span><span class="n">Tijucas, Cagarras, Rasa, Redonda, Maricás, Itaipu <small class="meta">a combinar</small></span></div>
+    <div class="entry"><span class="t">praias</span><span class="n">Itaipu, Piratininga, Forte do Rio Branco, Imbuí <small class="meta">a combinar</small></span></div>
+    <p class="next">A próxima folha deste diário pode ser a sua. <a href="https://wa.me/5500000000000" target="_blank" rel="noopener">Reserve pelo WhatsApp</a>.</p>
+    <div class="sign">El Capitán</div>
+    <div class="sign-line">assinatura do capitão · WhatsApp (00) 00000-0000</div>
+  </section>
+
+</main>
+
+<div class="bar"><span>escreva a sua folha<small>5h na El Soñador · Niterói e Rio</small></span><a href="https://wa.me/5500000000000" target="_blank" rel="noopener">Reservar</a></div>
+</body>
+</html>
