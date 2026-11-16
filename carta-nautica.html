@@ -89,7 +89,7 @@ footer{border-top:1px solid var(--ink);padding-block:22px 28px}
   .cartouche{display:grid;min-width:220px}
   .chartbox{grid-template-columns:1fr 340px}
   .mapwrap{border-bottom:0;border-right:2px solid var(--ink)}
-  .panel{display:flex;flex-direction:column;gap:10px;padding:20px}
+  .panel{display:flex;flex-direction:column;align-items:stretch;gap:10px;padding:20px}
   .ph{aspect-ratio:4/3}
   .cols{grid-template-columns:repeat(3,1fr);padding-block:56px}
   .strip{display:grid;grid-template-columns:repeat(5,1fr);margin-inline:0;padding-inline:0;overflow:visible}
@@ -112,10 +112,10 @@ footer{border-top:1px solid var(--ink);padding-block:22px 28px}
   <div class="chartbox">
     <div class="mapwrap">
       <div class="routes" role="group" aria-label="Escolher rota">
-        <button type="button" id="b-ilh" aria-pressed="true"><svg viewBox="0 0 22 6"><path d="M0 3h22" stroke="#c46a12" stroke-width="3" stroke-dasharray="2 3"/></svg>Ilhas</button>
         <button type="button" id="b-nit" aria-pressed="false"><svg viewBox="0 0 22 6"><path d="M0 3h22" stroke="#b0157a" stroke-width="3" stroke-dasharray="5 3"/></svg>De Niterói</button>
         <button type="button" id="b-rio" aria-pressed="false"><svg viewBox="0 0 22 6"><path d="M0 3h22" stroke="#16324a" stroke-width="3" stroke-dasharray="5 3"/></svg>Do Rio</button>
         <button type="button" id="b-pra" aria-pressed="false"><svg viewBox="0 0 22 6"><path d="M0 3h22" stroke="#0f7c6b" stroke-width="3" stroke-dasharray="2 3"/></svg>Praias</button>
+        <button type="button" id="b-ilh" aria-pressed="true"><svg viewBox="0 0 22 6"><path d="M0 3h22" stroke="#c46a12" stroke-width="3" stroke-dasharray="2 3"/></svg>Ilhas</button>
       </div>
       <svg id="map" viewBox="0 -20 880 628" role="img" aria-label="Carta esquemática da entrada da Baía de Guanabara com Rio, Niterói, ilhas e as rotas dos passeios">
         <defs>
@@ -295,6 +295,8 @@ footer{border-top:1px solid var(--ink);padding-block:22px 28px}
     document.getElementById('bar-btn').href='https://wa.me/5500000000000?text='+encodeURIComponent('Olá! Quero reservar o passeio '+R[r].name+' na El Soñador.');
     document.getElementById('stops').innerHTML=R[r].stops.map(function(id){return '<button type="button" data-id="'+id+'">'+(byId[id].short||byId[id].name)+'</button>'}).join('');
     [].forEach.call(document.getElementById('stops').children,function(b){b.addEventListener('click',function(){show(byId[b.dataset.id])})});
+    // no celular, deixa o botão da rota escolhida visível na faixa de botões
+    var rb=document.querySelector('.routes'),bt=document.getElementById('b-'+r);rb.scrollLeft=Math.max(0,bt.offsetLeft-rb.offsetLeft-10);
     setVB(R[r].vb);
     show(byId[R[r].stops[0]]);
   }
